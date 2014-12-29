@@ -36,7 +36,7 @@ public class SplitFile {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
-            frame.jtfSourceFile.setText("D://baozoumanhuaQQ.rar");
+            //frame.jtfSourceFile.setText("D://baozoumanhuaQQ.rar");
             frame.jtfSpecifyNumber.setText("3");
             //workFile = new workFileClass("D://tmp.dat");
             //workFile.splitFileIntoParts(3);
@@ -164,13 +164,14 @@ public class SplitFile {
         protected JButton jbtBrowse = new JButton("Browse");
         protected JButton jbtStart = new JButton("Start");
         protected JProgressBar jpbProgress = new JProgressBar();
+        protected JLabel jlbNote = new JLabel("note: Splited files will be saved as "
+                + "part*.dat in D:");
         
-        protected JPanel panel0 = new JPanel(new GridLayout(3,1));
         protected JPanel panel1 = new JPanel(new BorderLayout());
         protected JPanel panel2 = new JPanel(new BorderLayout());
         
         public mainFrame(){
-            setLayout(new GridLayout(4,1));
+            setLayout(new GridLayout(5,1));
             panel1.add(jlbSourceFile, BorderLayout.WEST);
             panel1.add(jtfSourceFile, BorderLayout.CENTER);
             panel1.add(jbtBrowse, BorderLayout.EAST);
@@ -179,15 +180,36 @@ public class SplitFile {
             this.add(panel1);
             this.add(panel2);
             this.add(jbtStart);
-            this.add(jpbProgress, BorderLayout.SOUTH);
+            this.add(jpbProgress);
+            this.add(jlbNote);
             
             jbtStart.addMouseListener(new MouseAdapter(){
                 @Override
                 public void mouseClicked(MouseEvent e){
-                    workFile = new workFileClass(jtfSourceFile.getText());
-                    workFile.numberOfSplitFile = Integer.parseInt(jtfSpecifyNumber.getText());
-                    System.out.println("workFile created.");
-                    semaphore.release(2);
+                    if(workFile!=null && workFile.sourceFile.exists()){
+                        workFile.numberOfSplitFile = Integer.parseInt(jtfSpecifyNumber.getText());
+                        System.out.println("workFile created.");
+                        semaphore.release(2);
+                    }
+                    else{
+                        System.out.println("workFile not created.Exit.");
+                        System.exit(0);
+                    }
+                }
+            });
+            
+            jbtBrowse.addMouseListener(new MouseAdapter(){
+                @Override
+                public void mouseClicked(MouseEvent e){
+                    fileChooser = new JFileChooser();
+                    if(fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION){
+                        workFile = new workFileClass(fileChooser.getSelectedFile().getAbsolutePath());
+                        jtfSourceFile.setText(fileChooser.getSelectedFile().getAbsolutePath());
+                        System.out.println(workFile.sourceFile.toString());
+                        
+                    }
+                    else
+                        System.exit(0);
                 }
             });
         }
